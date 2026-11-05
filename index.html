@@ -11,11 +11,18 @@
   button{background:#e07a55;color:#fff;border:0;border-radius:12px;padding:12px 14px;font-size:15px;font-weight:600}
   button.off{background:#333}
   #msg{position:fixed;top:40%;left:16px;right:16px;text-align:center;font-size:16px}
+  .ajustes{position:fixed;top:0;left:0;right:0;padding:10px 14px;background:linear-gradient(#000c,transparent);display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:13px}
+  .ajustes input{width:100%;accent-color:#e07a55}
 </style>
 </head>
 <body>
 <video id="v" autoplay playsinline muted></video>
 <div id="msg">Tocá "Iniciar" y apuntá la cámara a la pantalla del auto.<br><br>Tip: tocá la imagen para cambiar entre normal (para apuntar) y espejado (para leer).</div>
+<div class="ajustes">
+  <span id="lexp">Exposición</span><input id="exp" type="range" min="-3" max="3" step="0.1" value="0">
+  <span>Brillo</span><input id="bri" type="range" min="0.3" max="1.5" step="0.05" value="1">
+  <span>Contraste</span><input id="con" type="range" min="0.5" max="2.5" step="0.05" value="1">
+</div>
 <div class="barra">
   <button id="ini">Iniciar</button>
   <button id="h">↔ Espejo</button>
@@ -26,11 +33,18 @@
 <script>
 const v=document.getElementById('v'),msg=document.getElementById('msg');
 let h=true,vert=false,zoom=1,stream=null;
-function aplicar(){v.style.transform=`scale(${(h?-1:1)*zoom},${(vert?-1:1)*zoom})`}
+function aplicar(){v.style.transform=`scale(${(h?-1:1)*zoom},${(vert?-1:1)*zoom})`;
+  v.style.filter=`brightness(${document.getElementById('bri').value}) contrast(${document.getElementById('con').value})`}
+document.getElementById('bri').oninput=aplicar;document.getElementById('con').oninput=aplicar;
 async function iniciar(){
   try{
     stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
     v.srcObject=stream;msg.style.display='none';aplicar();
+    const track=stream.getVideoTracks()[0],cap=track.getCapabilities?track.getCapabilities():{};
+    const exp=document.getElementById('exp');
+    if(cap.exposureCompensation){exp.min=cap.exposureCompensation.min;exp.max=cap.exposureCompensation.max;exp.step=cap.exposureCompensation.step||0.1;
+      exp.oninput=()=>track.applyConstraints({advanced:[{exposureMode:'continuous',exposureCompensation:+exp.value}]}).catch(()=>{});}
+    else{document.getElementById('lexp').textContent='Exposición (no disponible)';exp.disabled=true;}
   }catch(e){msg.textContent='No pude abrir la cámara: '+e.message+'. Dale permiso a la cámara, o abrilo desde el link https.'}
 }
 document.getElementById('ini').onclick=iniciar;
