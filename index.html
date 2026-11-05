@@ -15,7 +15,7 @@
 </head>
 <body>
 <video id="v" autoplay playsinline muted></video>
-<div id="msg">Tocá "Iniciar" y apuntá la cámara a la pantalla del auto.</div>
+<div id="msg">Tocá "Iniciar" y apuntá la cámara a la pantalla del auto.<br><br>Tip: tocá la imagen para cambiar entre normal (para apuntar) y espejado (para leer).</div>
 <div class="barra">
   <button id="ini">Iniciar</button>
   <button id="h">↔ Espejo</button>
@@ -34,7 +34,9 @@ async function iniciar(){
   }catch(e){msg.textContent='No pude abrir la cámara: '+e.message+'. Dale permiso a la cámara, o abrilo desde el link https.'}
 }
 document.getElementById('ini').onclick=iniciar;
-document.getElementById('h').onclick=e=>{h=!h;e.target.classList.toggle('off',!h);aplicar()};
+const bh=document.getElementById('h');
+bh.onclick=()=>{h=!h;bh.classList.toggle('off',!h);aplicar()};
+v.onclick=()=>bh.onclick();
 document.getElementById('vv').onclick=e=>{vert=!vert;e.target.classList.toggle('off',!vert);aplicar()};
 document.getElementById('zm').onclick=e=>{zoom=zoom>=3?1:zoom+0.5;e.target.textContent=`Zoom ${zoom}x`;aplicar()};
 document.getElementById('cong').onclick=e=>{if(v.paused){v.play();e.target.classList.add('off');e.target.textContent='⏸ Congelar'}else{v.pause();e.target.classList.remove('off');e.target.textContent='▶ Seguir'}};
