@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Espejo Lifan</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;color:#fff;font-family:system-ui,sans-serif;overflow:hidden}
+  video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:center}
+  .barra{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;justify-content:center;padding:12px;background:linear-gradient(transparent,#000c)}
+  button{background:#e07a55;color:#fff;border:0;border-radius:12px;padding:12px 14px;font-size:15px;font-weight:600}
+  button.off{background:#333}
+  #msg{position:fixed;top:40%;left:16px;right:16px;text-align:center;font-size:16px}
+</style>
+</head>
+<body>
+<video id="v" autoplay playsinline muted></video>
+<div id="msg">Tocá "Iniciar" y apuntá la cámara a la pantalla del auto.</div>
+<div class="barra">
+  <button id="ini">Iniciar</button>
+  <button id="h">↔ Espejo</button>
+  <button id="vv" class="off">↕ Dar vuelta</button>
+  <button id="zm">Zoom 1x</button>
+  <button id="cong" class="off">⏸ Congelar</button>
+</div>
+<script>
+const v=document.getElementById('v'),msg=document.getElementById('msg');
+let h=true,vert=false,zoom=1,stream=null;
+function aplicar(){v.style.transform=`scale(${(h?-1:1)*zoom},${(vert?-1:1)*zoom})`}
+async function iniciar(){
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+    v.srcObject=stream;msg.style.display='none';aplicar();
+  }catch(e){msg.textContent='No pude abrir la cámara: '+e.message+'. Dale permiso a la cámara, o abrilo desde el link https.'}
+}
+document.getElementById('ini').onclick=iniciar;
+document.getElementById('h').onclick=e=>{h=!h;e.target.classList.toggle('off',!h);aplicar()};
+document.getElementById('vv').onclick=e=>{vert=!vert;e.target.classList.toggle('off',!vert);aplicar()};
+document.getElementById('zm').onclick=e=>{zoom=zoom>=3?1:zoom+0.5;e.target.textContent=`Zoom ${zoom}x`;aplicar()};
+document.getElementById('cong').onclick=e=>{if(v.paused){v.play();e.target.classList.add('off');e.target.textContent='⏸ Congelar'}else{v.pause();e.target.classList.remove('off');e.target.textContent='▶ Seguir'}};
+aplicar();
+</script>
+</body>
+</html>
