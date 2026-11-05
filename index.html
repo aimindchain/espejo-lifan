@@ -11,8 +11,11 @@
   button{background:#e07a55;color:#fff;border:0;border-radius:12px;padding:12px 14px;font-size:15px;font-weight:600}
   button.off{background:#333}
   #msg{position:fixed;top:40%;left:16px;right:16px;text-align:center;font-size:16px}
-  .ajustes{position:fixed;top:0;left:0;right:0;padding:10px 14px;background:linear-gradient(#000c,transparent);display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:13px}
-  .ajustes input{width:100%;accent-color:#e07a55}
+  .barra{z-index:5;flex-wrap:wrap}
+  button{padding:10px 12px;font-size:14px}
+  .ajustes{position:fixed;left:10px;right:10px;bottom:76px;z-index:6;padding:14px;border-radius:14px;background:#000d;display:none;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:13px}
+  .ajustes.on{display:grid}
+  .ajustes input{width:100%;accent-color:#e07a55;height:28px}
 </style>
 </head>
 <body>
@@ -29,12 +32,14 @@
   <button id="vv" class="off">↕ Dar vuelta</button>
   <button id="zm">Zoom 1x</button>
   <button id="cong" class="off">⏸ Congelar</button>
+  <button id="aj" class="off">☀️</button>
 </div>
 <script>
 const v=document.getElementById('v'),msg=document.getElementById('msg');
 let h=true,vert=false,zoom=1,stream=null;
 function aplicar(){v.style.transform=`scale(${(h?-1:1)*zoom},${(vert?-1:1)*zoom})`;
   v.style.filter=`brightness(${document.getElementById('bri').value}) contrast(${document.getElementById('con').value})`}
+document.getElementById('aj').onclick=e=>{const a=document.querySelector('.ajustes');a.classList.toggle('on');e.target.classList.toggle('off',!a.classList.contains('on'))};
 document.getElementById('bri').oninput=aplicar;document.getElementById('con').oninput=aplicar;
 async function iniciar(){
   try{
